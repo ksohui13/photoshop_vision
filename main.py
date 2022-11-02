@@ -349,8 +349,6 @@ class MainWindow(QMainWindow):
 
     def brush(self):
         print("브러쉬")
-
-
     
 
 
