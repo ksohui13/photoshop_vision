@@ -1,3 +1,4 @@
+from queue import Empty
 import sys
 import cv2
 from PySide6.QtGui import QAction, QImage, QPixmap
@@ -25,15 +26,18 @@ class MainWindow(QMainWindow):
         button1 = QPushButton("이미지 열기")
         button2 = QPushButton("좌우반전")
         button3 = QPushButton("새로고침")
+        button4 = QPushButton("label 확인")
 
         button1.clicked.connect(self.show_file_dialog) #버튼 기능 추가
         button2.clicked.connect(self.flip_image)
         button3.clicked.connect(self.clear_label)
+        button4.clicked.connect(self.check_lavel)
         
         #사이드바에 메뉴버튼 추가(위젯)
         sidebar.addWidget(button1)
         sidebar.addWidget(button2)
         sidebar.addWidget(button3)
+        sidebar.addWidget(button4)
 
         main_layout.addLayout(sidebar)
 
@@ -74,6 +78,13 @@ class MainWindow(QMainWindow):
     #작업 취소
     def clear_label(self):
         self.label2.clear()
+    
+    # #레이블 확인
+    # def check_lavel(self):
+    #     if QPixmap(self) is Empty:
+    #         print("null")
+    #     else:
+    #         print("exist")
 
 
 if __name__ == "__main__":

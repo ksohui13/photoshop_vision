@@ -1,9 +1,11 @@
 import sys
 import cv2
+import numpy as np
+import matplotlib.pyplot as plt
 from PySide6.QtGui import QAction, QImage, QPixmap, QIcon
 from PySide6.QtWidgets import (QApplication,QWidget, QLabel, 
 QMainWindow, QHBoxLayout, QVBoxLayout, 
-QPushButton, QFileDialog, QToolBar, QStatusBar)
+QPushButton, QFileDialog, QToolBar, QStatusBar, QMessageBox)
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -21,15 +23,15 @@ class MainWindow(QMainWindow):
         sidebar = QVBoxLayout()
         button1 = QPushButton("이미지 열기")
         button2 = QPushButton("저장")
-        button3 = QPushButton("다른 이름으로 저장")
-        button4 = QPushButton("이전")
-        button5 = QPushButton("작업 취소")
-        button6 = QPushButton("나가기")
+        button3 = QPushButton("이전")
+        button4 = QPushButton("작업 취소")
+        button5 = QPushButton("나가기")
         #사이드바 메뉴-기능 연결
         button1.clicked.connect(self.show_file_dialog) 
+        button2.clicked.connect(self.save_file)
         #... 나머지 추가 예정
-        button5.clicked.connect(self.clear_label)
-        button6.clicked.connect(qApp.quit)
+        button4.clicked.connect(self.clear_label)
+        button5.clicked.connect(qApp.quit)
         #6까지 추가
         #사이드바에 메뉴버튼 추가(위젯)
         sidebar.addWidget(button1)
@@ -37,7 +39,6 @@ class MainWindow(QMainWindow):
         sidebar.addWidget(button3)
         sidebar.addWidget(button4)
         sidebar.addWidget(button5)
-        sidebar.addWidget(button6)
 
         main_layout.addLayout(sidebar)
 
@@ -47,17 +48,18 @@ class MainWindow(QMainWindow):
         #확대
         bigger = QAction("확대", self) #버튼 이름
         bigger.setStatusTip("확대") #setStatusTip : 커서를 올려뒀을 때 나오는 설명창
-        bigger.triggered.connect(self.toolbarButtonClick) #연결할 기능
+        bigger.triggered.connect(self.bigger) #연결할 기능
 
         #축소
         smaller  = QAction("축소", self) 
         smaller.setStatusTip("축소") 
-        smaller.triggered.connect(self.toolbarButtonClick) 
+        smaller.triggered.connect(self.smaller) 
 
         #회전
         rotation  = QAction("회전", self)
+        rotation.setShortcut('Ctrl+r')
         rotation.setStatusTip("회전")
-        rotation.triggered.connect(self.toolbarButtonClick)
+        rotation.triggered.connect(self.rotation)
 
         #좌우반전
         lr_flip  = QAction("좌우반전", self)
@@ -67,93 +69,98 @@ class MainWindow(QMainWindow):
         #상하반전
         ud_flip  = QAction("상하반전", self)
         ud_flip.setStatusTip("상하반전")
-        ud_flip.triggered.connect(self.toolbarButtonClick)
+        ud_flip.triggered.connect(self.ud_flip)
 
         #자르기
         cut = QAction("자르기", self) 
         cut.setStatusTip("자르기")
-        cut.triggered.connect(self.toolbarButtonClick) 
+        cut.triggered.connect(self.cut) 
+
+        #원형으로 자르기
+        circle_cut = QAction("원형 자르기", self)
+        circle_cut.setStatusTip("원형 자르기")
+        circle_cut.triggered.connect(self.circle_cut)
 
 
         #이미지
         #뒤틀리기
         twist = QAction("뒤틀리기", self)
         twist.setStatusTip("뒤틀리기")
-        twist.triggered.connect(self.toolbarButtonClick)
+        twist.triggered.connect(self.twist)
 
         #리퀴파이
         liquefy = QAction("리퀴파이", self)
         liquefy.setStatusTip("리퀴파이")
-        liquefy.triggered.connect(self.toolbarButtonClick)
+        liquefy.triggered.connect(self.liquefy)
 
         #렌즈 왜곡
         distortion = QAction("렌즈 왜곡", self)
         distortion.setStatusTip("렌즈 왜곡")
-        distortion.triggered.connect(self.toolbarButtonClick)
+        distortion.triggered.connect(self.distortion)
 
         #모자이크
         mosaic = QAction("모자이크", self)
         mosaic.setStatusTip("모자이크")
-        mosaic.triggered.connect(self.toolbarButtonClick)
+        mosaic.triggered.connect(self.mosaic)
 
         #합성
         compose = QAction("합성", self)
         compose.setStatusTip("합성")
-        compose.triggered.connect(self.toolbarButtonClick)
+        compose.triggered.connect(self.compose)
 
 
         #색상
         #밝기 조절
         bright = QAction("밝기 조절", self)
         bright.setStatusTip("밝기 조절")
-        bright.triggered.connect(self.toolbarButtonClick) 
+        bright.triggered.connect(self.bright) 
 
         #색상반전
         color_inversion = QAction("색상 반전", self)
         color_inversion.setStatusTip("색상 반전")
-        color_inversion.triggered.connect(self.toolbarButtonClick)
+        color_inversion.triggered.connect(self.color_inversion)
 
         #흑백
         gray_scale = QAction("흑백", self)
         gray_scale.setStatusTip("흑백")
-        gray_scale.triggered.connect(self.toolbarButtonClick)
+        gray_scale.triggered.connect(self.gray_scale)
 
         #특정 색상 반전
         set_color_inversion = QAction("특정 색상 반전", self)
         set_color_inversion.setStatusTip("특정 색상 반전")
-        set_color_inversion.triggered.connect(self.toolbarButtonClick)
+        set_color_inversion.triggered.connect(self.set_color_inversion)
 
 
         #그리기
         #원그리기
         circle = QAction("원", self)
         circle.setStatusTip("원")
-        circle.triggered.connect(self.toolbarButtonClick)
+        circle.triggered.connect(self.circle)
         
         #사각형 그리기
         square = QAction("사각형", self)
         square.setStatusTip("사각형")
-        square.triggered.connect(self.toolbarButtonClick)
+        square.triggered.connect(self.square)
 
         #삼각형 그리기
         triangle = QAction("삼각형", self)
         triangle.setStatusTip("삼각형")
-        triangle.triggered.connect(self.toolbarButtonClick)
+        triangle.triggered.connect(self.triangle)
 
         #직선 그리기
         line = QAction("직선", self)
         line.setStatusTip("직선")
-        line.triggered.connect(self.toolbarButtonClick)
+        line.triggered.connect(self.line)
 
         #브러쉬
         brush = QAction("브러쉬", self)
         brush.setStatusTip("브러쉬")
-        brush.triggered.connect(self.toolbarButtonClick)
+        brush.triggered.connect(self.brush)
 
         #선택
         select = QAction("선택", self)
         select.setStatusTip("선택")
-        select.triggered.connect(self.toolbarButtonClick)
+        select.triggered.connect(self.select)
 
 
         #---메뉴 추가---
@@ -167,6 +174,7 @@ class MainWindow(QMainWindow):
         file_menu1.addAction(lr_flip)
         file_menu1.addAction(ud_flip)
         file_menu1.addAction(cut)
+        file_menu1.addAction(circle_cut)
 
         file_menu2 = menu.addMenu("&이미지")
         file_menu2.addAction(twist)
@@ -226,6 +234,12 @@ class MainWindow(QMainWindow):
     def clear_label(self):
         self.label2.clear()
 
+    #저장
+    def save_file(self):
+        save_file = QFileDialog.getSaveFileName(self, 'Save file', './')
+        self.label2.setText(save_file[0])
+        print("저장")
+
     #확대
     def bigger(self):
         print("확대")
@@ -235,7 +249,20 @@ class MainWindow(QMainWindow):
         print("축소")
     
     #회전
-    def rotation(self):
+    def rotation(self): #수정중
+        h, w, _ = self.image.shape
+        d90 = 90.0 * np.pi / 180.0 #90도
+        m90 = np.float32([
+            [np.cos(d90), -1*np.sin(d90), h],
+            [np.sin(d90), np.cos(d90), 0]
+        ])
+        r90 = cv2.warpAffine(self.image, m90, (h, w))
+
+        bytes_per_line = 3 * w
+        image = QImage(r90.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        pixmap = QPixmap(image)
+        self.label2.setPixmap(pixmap)
+
         print("회전")
     
     #좌우반전
@@ -253,6 +280,18 @@ class MainWindow(QMainWindow):
 
     def cut(self):
         print("자르기")
+
+    def circle_cut(self): #수정중
+        h, w, _ = self.image.shape
+        mask = np.zeros_like(self.image)
+        cv2.circle(mask, (int(w/2), int(w/2)), int(w/2), (255, 255, 255), -1)
+        cv2.bitwise_and(self.image, mask)
+
+        bytes_per_line = 3 * w
+        image = QImage(self.image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        pixmap = QPixmap(image)
+        self.label2.setPixmap(pixmap)
+        print("원형 자르기")
 
     def twist(self):
         print("뒤틀리기")
@@ -276,9 +315,21 @@ class MainWindow(QMainWindow):
         print("밝기 조절")
 
     def color_inversion(self):
+        h, w, _ = self.image.shape #높이 너비 채널
+        bytes_per_line = 3 * w
+        image = QImage(self.image.data, w, h, bytes_per_line, QImage.Format_BGR888).rgbSwapped()
+        pixmap = QPixmap(image)
+        self.label2.setPixmap(pixmap)
         print("색상 반전")
 
     def gray_scale(self):
+        # cv2.IMREAD_GRAYSCALE(self.image)
+        image = cv2.cvtColor(self.image, cv2.COLOR_RGB2GRAY)
+        h, w, _ = self.image.shape #높이 너비 채널
+        bytes_per_line = 3 * w
+        image = QImage(self.image.data, w, h, bytes_per_line, QImage.Format_Alpha8).rgbSwapped()
+        pixmap = QPixmap(image)
+        self.label2.setPixmap(pixmap)
         print("흑백")
 
     def set_color_inversion(self):
