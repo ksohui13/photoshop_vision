@@ -1,11 +1,11 @@
-import sys
-import cv2
+import sys, cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from PySide6.QtGui import QAction, QImage, QPixmap, QIcon
+from PySide6.QtGui import QAction, QImage, QPixmap, QPainter
 from PySide6.QtWidgets import (QApplication,QWidget, QLabel, 
 QMainWindow, QHBoxLayout, QVBoxLayout, 
 QPushButton, QFileDialog, QToolBar, QStatusBar, QMessageBox)
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -29,10 +29,9 @@ class MainWindow(QMainWindow):
         #사이드바 메뉴-기능 연결
         button1.clicked.connect(self.show_file_dialog) 
         button2.clicked.connect(self.save_file)
-        #... 나머지 추가 예정
+        #이전 기능 추가 예정
         button4.clicked.connect(self.clear_label)
         button5.clicked.connect(qApp.quit)
-        #6까지 추가
         #사이드바에 메뉴버튼 추가(위젯)
         sidebar.addWidget(button1)
         sidebar.addWidget(button2)
@@ -125,10 +124,44 @@ class MainWindow(QMainWindow):
         gray_scale.setStatusTip("흑백")
         gray_scale.triggered.connect(self.gray_scale)
 
-        #특정 색상 반전
-        set_color_inversion = QAction("특정 색상 반전", self)
-        set_color_inversion.setStatusTip("특정 색상 반전")
-        set_color_inversion.triggered.connect(self.set_color_inversion)
+
+        #블러필터
+        #블러
+        blur = QAction("블러", self)
+        blur.setStatusTip("블러")
+        blur.triggered.connect(self.blur)
+
+        #가우시안 블러
+        gaussian_blur = QAction("가우시안 블러", self)
+        gaussian_blur.setStatusTip("가우시안 블러")
+        gaussian_blur.triggered.connect(self.gaussian_blur)
+
+        #미디언 블러링
+        median_blur = QAction("미디언 블러링", self)
+        median_blur.setStatusTip("미디언 블러링")
+        median_blur.triggered.connect(self.median_blur)
+
+        #바이래터널 필터
+        bilateral_filter = QAction("바이래터널 필터")
+        bilateral_filter.setStatusTip("바이래터널 필터")
+        bilateral_filter.triggered.connect(self.bilateral_filter)
+
+
+        #경계 필터
+        #로버츠 교차 필터
+        roberts_filter = QAction("로버츠 교차 필터")
+        roberts_filter.setStatusTip("로버츠 교차 필터")
+        roberts_filter.triggered.connect(self.roberts_filter)
+
+        #소벨필터
+        sobel_filter = QAction("소벨 필터")
+        sobel_filter.setStatusTip("소벨 필터")
+        sobel_filter.triggered.connect(self.sobel_filter)
+
+        #캐니 엣지 필터
+        canny_edge = QAction("캐니 엣지 필터")
+        canny_edge.setStatusTip("캐니 엣지 필터")
+        canny_edge.triggered.connect(self.canny_edge)
 
 
         #그리기
@@ -190,14 +223,24 @@ class MainWindow(QMainWindow):
         file_menu4.addAction(bright)
         file_menu4.addAction(color_inversion)
         file_menu4.addAction(gray_scale)
-        file_menu4.addAction(set_color_inversion)
 
-        file_menu5 = menu.addMenu("&그리기")
-        file_menu5.addAction(circle)
-        file_menu5.addAction(square)
-        file_menu5.addAction(triangle)
-        file_menu5.addAction(line)
-        file_menu5.addAction(brush)
+        file_menu5 = menu.addMenu("&블러 필터")
+        file_menu5.addAction(blur)
+        file_menu5.addAction(gaussian_blur)
+        file_menu5.addAction(median_blur)
+        file_menu5.addAction(bilateral_filter)
+
+        file_menu6 = menu.addMenu("&경계필터")
+        file_menu6.addAction(roberts_filter)
+        file_menu6.addAction(sobel_filter)
+        file_menu6.addAction(canny_edge)
+
+        file_menu7 = menu.addMenu("&그리기")
+        file_menu7.addAction(circle)
+        file_menu7.addAction(square)
+        file_menu7.addAction(triangle)
+        file_menu7.addAction(line)
+        file_menu7.addAction(brush)
         
         
         #메인 화면 구성
@@ -206,7 +249,7 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(self.label1)
 
         self.label2 = QLabel(self)
-        self.label2.setFixedSize(640, 480) 
+        # self.label2.setFixedSize(640, 480) 
         main_layout.addWidget(self.label2)
 
         widget = QWidget(self)
@@ -225,19 +268,24 @@ class MainWindow(QMainWindow):
         image = QImage(self.image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         pixmap = QPixmap(image)
         self.label1.setPixmap(pixmap)
-
-    #메뉴바 버튼 클릭 확인용 - 추후에 삭제
-    def toolbarButtonClick(self, s):
-        print("click", s)
     
     #작업 취소
     def clear_label(self):
         self.label2.clear()
 
     #저장
-    def save_file(self):
-        save_file = QFileDialog.getSaveFileName(self, 'Save file', './')
-        self.label2.setText(save_file[0])
+    def save_file(self): #null값 수정
+        # save_file = QFileDialog.getSaveFileName(self, 'Save file', './')
+        # self.label2.setText(save_file[0])
+        if self.image.isNull() == False: #만약 사진이 있다면
+            image_file, _ = QFileDialog.getSaveFileName(self, "Save Image", "","PNG Files (*.png);;JPG Files (*.jpeg *.jpg );;Bitmap Files (*.bmp);;\
+                    GIF Files (*.gif)" )
+            if image_file and self.image.isnull() == False:
+                self.image.save(image_file)
+            else:
+                QMessageBox.information(self, "Error", "이미지를 저장 할 수 없습니다.", QMessageBox.Ok)
+        else:
+            QMessageBox.information(self, "이미지 없음", "저장 할 이미지가 없습니다.", QMessageBox.Ok)
         print("저장")
 
     #확대
@@ -323,17 +371,96 @@ class MainWindow(QMainWindow):
         print("색상 반전")
 
     def gray_scale(self):
-        # cv2.IMREAD_GRAYSCALE(self.image)
         image = cv2.cvtColor(self.image, cv2.COLOR_RGB2GRAY)
-        h, w, _ = self.image.shape #높이 너비 채널
-        bytes_per_line = 3 * w
-        image = QImage(self.image.data, w, h, bytes_per_line, QImage.Format_Alpha8).rgbSwapped()
+        h, w = image.shape #높이 너비 채널
+        bytes_per_line = 1 * w #흑백은 1차원 이미지
+        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_Grayscale8)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("흑백")
 
-    def set_color_inversion(self):
-        print("특정 색상 반전")
+    def blur(self):
+        kernel = np.full((5, 5), 0.04)
+        image = cv2.filter2D(self.image, -1, kernel)
+
+        h, w, _ = image.shape #높이 너비 채널
+        bytes_per_line = 3 * w
+        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        pixmap = QPixmap(image)
+        self.label2.setPixmap(pixmap)
+        print("블러")
+
+    def gaussian_blur(self):
+        kernel = np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]]) * (1/ 16)
+        image = cv2.filter2D(self.image, -1, kernel)
+
+        h, w, _ = image.shape #높이 너비 채널
+        bytes_per_line = 3 * w
+        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        pixmap = QPixmap(image)
+        self.label2.setPixmap(pixmap)
+        print("가우시안 블러")
+
+    def median_blur(self):
+        image = cv2.medianBlur(self.image, 5)
+
+        h, w, _ = image.shape #높이 너비 채널
+        bytes_per_line = 3 * w
+        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        pixmap = QPixmap(image)
+        self.label2.setPixmap(pixmap)
+        print("미디언 블러링")
+
+    def bilateral_filter(self):
+        image = cv2.bilateralFilter(self.image, 5, 75, 75)
+
+        h, w, _ = image.shape #높이 너비 채널
+        bytes_per_line = 3 * w
+        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        pixmap = QPixmap(image)
+        self.label2.setPixmap(pixmap)
+        print("바이래터널 필터")
+
+    def roberts_filter(self): #수정중
+        gx_kernel = np.array([[1, 0],[0, -1]]) #x축의 경계만 나옴
+        gy_kernel = np.array([[0, 1],[-1, 0]]) #y축의 경계만 나옴
+
+        edge_gx = cv2.filter2D(self.image, -1, gx_kernel)
+        edge_gy = cv2.filter2D(self.image, -1, gy_kernel)
+
+        roberts_edge = edge_gx + edge_gy
+
+        h, w, _ = image.shape #높이 너비 채널
+        bytes_per_line = 3 * w
+        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        pixmap = QPixmap(image)
+        self.label2.setPixmap(pixmap)
+        
+        print("로버츠 교차 필터")
+
+    def sobel_filter(self): #수정중
+        gx_kernel = np.array([[-1, 0, 1],[-2, 0, 2], [-1, 0, 1]]) 
+        gy_kernel = np.array([[-1, -2, -1],[0, 0, 0], [1, 2, 1]]) 
+
+        edge_gx = cv2.filter2D(self.image, -1, gx_kernel)
+        edge_gy = cv2.filter2D(self.image, -1, gy_kernel)
+
+        h, w, _ = image.shape #높이 너비 채널
+        bytes_per_line = 3 * w
+        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        pixmap = QPixmap(image)
+        self.label2.setPixmap(pixmap)
+        print("소벨 필터")
+
+    def canny_edge(self):
+        edge = cv2.Canny(self.image, 50, 200)
+
+        h, w, _ = image.shape #높이 너비 채널
+        bytes_per_line = 3 * w
+        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        pixmap = QPixmap(image)
+        self.label2.setPixmap(pixmap)
+        print("캐니 엣지 필터")
 
     def circle(self):
         print("원")
@@ -345,6 +472,10 @@ class MainWindow(QMainWindow):
         print("삼각형")
     
     def line(self):
+        qp = QPainter()
+        qp.begin(self)
+        self.draw_line(qp)
+        qp.end()
         print("직선 그리기")
 
     def brush(self):
