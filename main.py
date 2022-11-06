@@ -1,7 +1,7 @@
 import sys, cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from PySide6.QtGui import QAction, QImage, QPixmap, QPainter
+from PySide6.QtGui import QAction, QImage, QPixmap, QPainter, QIcon
 from PySide6.QtWidgets import (QApplication,QWidget, QLabel, 
 QMainWindow, QHBoxLayout, QVBoxLayout, 
 QPushButton, QFileDialog, QToolBar, QStatusBar, QMessageBox)
@@ -11,10 +11,39 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Simple Photoshop")
+        self.initUI()
 
-        #메뉴바
-        toolbar = QToolBar("Main toolbar")
-        self.addToolBar(toolbar)
+#내부 UI
+    def initUI(self):
+        #toolbar-기능
+        open_file = QAction(QIcon('./icons/open_folder_color.png'),"파일 열기", self)
+        open_file.setStatusTip("파일 열기")
+        open_file.triggered.connect(self.show_file_dialog)
+
+        save_file = QAction(QIcon('./icons/save_color.png'), "저장", self)
+        save_file.setStatusTip("저장")
+        # save_file.trigger.connect(self.save_file) #save_file 함수 만들기
+
+        clear_label = QAction(QIcon('./icons/delete_file.png'), "작업 전체 취소", self)
+        clear_label.setStatusTip("작업 전체 취소")
+        clear_label.triggered.connect(self.clear_label)
+
+        exit = QAction(QIcon('./icons/logout_color.png'), "나가기", self)
+        exit.setStatusTip("나가기")
+        exit.triggered.connect(qApp.quit)
+
+        self.statusBar()
+
+        #toolbar 메뉴 추가
+        toolbar = self.addToolBar('openfile')
+        toolbar.addAction(open_file)
+        toolbar = self.addToolBar('save_file')
+        toolbar.addAction(save_file)
+        toolbar = self.addToolBar('clear_label')
+        toolbar.addAction(clear_label)
+        toolbar = self.addToolBar('exit')
+        toolbar.addAction(exit)
+        
 
         #메인화면 레이아웃
         main_layout = QHBoxLayout()
@@ -196,16 +225,23 @@ class MainWindow(QMainWindow):
         select.triggered.connect(self.select)
 
 
-        #---메뉴 추가---
+        #---드랍메뉴 추가---
         self.setStatusBar(QStatusBar(self))
 
         menu = self.menuBar()
         file_menu1 = menu.addMenu("&기본 편집") #메뉴바에 메뉴 추가
         file_menu1.addAction(bigger)
         file_menu1.addAction(smaller)
+        #분할선 추가
+        separator = QAction(self)
+        separator.setSeparator(True)
+        file_menu1.addAction(separator)
         file_menu1.addAction(rotation)
         file_menu1.addAction(lr_flip)
         file_menu1.addAction(ud_flip)
+        separator = QAction(self)
+        separator.setSeparator(True)
+        file_menu1.addAction(separator)
         file_menu1.addAction(cut)
         file_menu1.addAction(circle_cut)
 
@@ -241,7 +277,6 @@ class MainWindow(QMainWindow):
         file_menu7.addAction(triangle)
         file_menu7.addAction(line)
         file_menu7.addAction(brush)
-        
         
         #메인 화면 구성
         self.label1 = QLabel(self)
