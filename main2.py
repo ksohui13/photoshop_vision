@@ -2,7 +2,7 @@ import sys, cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import ImageQt
-from PySide6.QtGui import QAction, QImage, QPixmap, QPainter, QIcon, QTransform
+from PySide6.QtGui import QAction, QImage, QPixmap, QPainter, QIcon
 from PySide6.QtWidgets import (QApplication,QWidget, QLabel, 
 QMainWindow, QHBoxLayout, QVBoxLayout, 
 QPushButton, QFileDialog, QToolBar, QStatusBar, QMessageBox)
@@ -12,13 +12,12 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Simple Photoshop")
-        self.setWindowIcon(QIcon('./icons/editor2.png'))
         self.initUI()
 
 #내부 UI
     def initUI(self):
         #배경색
-        # self.setStyleSheet("background-color: #E7E9EC;")
+        self.setStyleSheet("background-color: #E7E9EC;")
 
         #toolbar-기능
         open_file = QAction(QIcon('./icons/open4.png'),"파일 열기", self)
@@ -42,66 +41,40 @@ class MainWindow(QMainWindow):
         #toolbar 메뉴 추가
         toolbar = self.addToolBar('openfile')
         toolbar.addAction(open_file)
-        toolbar.setStyleSheet("background-color: #E8EAED;") 
         toolbar = self.addToolBar('save_file')
         toolbar.addAction(save_file)
-        toolbar.setStyleSheet("background-color: #E8EAED;")
         toolbar = self.addToolBar('clear_label')
-        toolbar.setStyleSheet("background-color: #E8EAED;")
         toolbar.addAction(clear_label)
-        toolbar.setStyleSheet("background-color: #E8EAED;")
         toolbar = self.addToolBar('exit')
         toolbar.addAction(exit)
-        toolbar.setStyleSheet("background-color: #E8EAED;")
         
 
         #메인화면 레이아웃
         main_layout = QHBoxLayout()
 
         #사이드바 메뉴버튼
-        sidebar = QVBoxLayout()
-        # sidebar.style("border-style: solid; border-width:2px; border-color: white;")
-        button1 = QPushButton("회전(90)")
-        button2 = QPushButton("회전(-90)")
+        # sidebar = QVBoxLayout()
+        # button1 = QPushButton("이미지 열기")
+        # button2 = QPushButton("저장")
         # button3 = QPushButton("이전")
         # button4 = QPushButton("작업 취소")
         # button5 = QPushButton("나가기")
         # #사이드바 메뉴-기능 연결
-        button1.clicked.connect(self.rotation_clock) 
-        button2.clicked.connect(self.rotation_counter)
+        # button1.clicked.connect(self.show_file_dialog) 
+        # button2.clicked.connect(self.save_file)
+        # #이전 기능 추가 예정
         # button4.clicked.connect(self.clear_label)
         # button5.clicked.connect(qApp.quit)
         # #사이드바에 메뉴버튼 추가(위젯)
-        sidebar.addWidget(button1)
-        sidebar.addWidget(button2)
+        # sidebar.addWidget(button1)
+        # sidebar.addWidget(button2)
         # sidebar.addWidget(button3)
         # sidebar.addWidget(button4)
         # sidebar.addWidget(button5)
 
-        main_layout.addLayout(sidebar)
+        # main_layout.addLayout(sidebar)
 
         #----- 기능 ------
-        #파일
-        #파일 열기
-        show_file_dialog = QAction("파일 열기", self)
-        show_file_dialog.setStatusTip("파일 열기")
-        show_file_dialog.triggered.connect(self.show_file_dialog)
-
-        #저장
-        save_file = QAction("저장",self)
-        save_file.setStatusTip("저장")
-        save_file.triggered.connect(self.save_file)
-
-        #작업 취소
-        clear_label = QAction("작업 취소", self)
-        clear_label.setStatusTip("작업 취소")
-        clear_label.triggered.connect(self.clear_label)
-
-        #나가기
-        exit_window = QAction("나가기", self)
-        exit_window.setStatusTip("나가기")
-        exit_window.triggered.connect(qApp.quit)
-
         #기본 편집
         #확대
         bigger = QAction("확대", self) #버튼 이름
@@ -113,31 +86,26 @@ class MainWindow(QMainWindow):
         smaller.setStatusTip("축소") 
         smaller.triggered.connect(self.smaller) 
 
-        #회전-시계방향
-        rotation_clock  = QAction("시계 방향 회전", self)
-        rotation_clock.setShortcut('Ctrl+r')
-        rotation_clock.setStatusTip("시계 방향 회전")
-        rotation_clock.triggered.connect(self.rotation_clock)
-
-        #회전-반시계방향
-        rotation_counter = QAction("반시계 방향 회전", self)
-        rotation_counter.setStatusTip("반시계 방향 회전")
-        rotation_counter.triggered.connect(self.rotation_counter)
+        #회전
+        rotation  = QAction("회전", self)
+        rotation.setShortcut('Ctrl+r')
+        rotation.setStatusTip("회전")
+        rotation.triggered.connect(self.rotation)
 
         #좌우반전
-        flip  = QAction("좌우반전", self)
-        flip.setStatusTip("좌우반전")
-        flip.triggered.connect(self.flip)
+        lr_flip  = QAction("좌우반전", self)
+        lr_flip.setStatusTip("좌우반전")
+        lr_flip.triggered.connect(self.lr_flip)
 
         #상하반전
-        flip_v  = QAction("상하반전", self)
-        flip_v.setStatusTip("상하반전")
-        flip_v.triggered.connect(self.flip_v)
+        ud_flip  = QAction("상하반전", self)
+        ud_flip.setStatusTip("상하반전")
+        ud_flip.triggered.connect(self.ud_flip)
 
         #자르기
-        crop = QAction("자르기", self) 
-        crop.setStatusTip("자르기")
-        crop.triggered.connect(self.crop) 
+        cut = QAction("자르기", self) 
+        cut.setStatusTip("자르기")
+        cut.triggered.connect(self.cut) 
 
         #원형으로 자르기
         circle_cut = QAction("원형 자르기", self)
@@ -279,23 +247,16 @@ class MainWindow(QMainWindow):
         brush.setStatusTip("브러쉬")
         brush.triggered.connect(self.brush)
 
-        # #선택
-        # select = QAction("선택", self)
-        # select.setStatusTip("선택")
-        # select.triggered.connect(self.select)
+        #선택
+        select = QAction("선택", self)
+        select.setStatusTip("선택")
+        select.triggered.connect(self.select)
 
 
         #---드랍메뉴 추가---
         self.setStatusBar(QStatusBar(self))
 
         menu = self.menuBar()
-        menu.setStyleSheet("background-color: #F5F5F5;")
-        file_menu0 = menu.addMenu("&파일")
-        file_menu0.addAction(show_file_dialog)
-        file_menu0.addAction(save_file)
-        file_menu0.addAction(clear_label)
-        file_menu0.addAction(exit_window)
-
         file_menu1 = menu.addMenu("&기본 편집") #메뉴바에 메뉴 추가
         file_menu1.addAction(bigger)
         file_menu1.addAction(smaller)
@@ -303,14 +264,13 @@ class MainWindow(QMainWindow):
         separator = QAction(self)
         separator.setSeparator(True)
         file_menu1.addAction(separator)
-        file_menu1.addAction(rotation_clock)
-        file_menu1.addAction(rotation_counter)
-        file_menu1.addAction(flip)
-        file_menu1.addAction(flip_v)
+        file_menu1.addAction(rotation)
+        file_menu1.addAction(lr_flip)
+        file_menu1.addAction(ud_flip)
         separator = QAction(self)
         separator.setSeparator(True)
         file_menu1.addAction(separator)
-        file_menu1.addAction(crop)
+        file_menu1.addAction(cut)
         file_menu1.addAction(circle_cut)
 
         file_menu2 = menu.addMenu("&이미지")
@@ -321,7 +281,7 @@ class MainWindow(QMainWindow):
         file_menu2.addAction(compose)
 
         file_menu3 = menu.addMenu("&선택")
-        # file_menu3.addAction(select)
+        file_menu3.addAction(select)
 
         file_menu4 = menu.addMenu("&색상")
         file_menu4.addAction(bright)
@@ -374,6 +334,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
 #------기능 관련 함수 -----
+
     #파일 불러오기
     def show_file_dialog(self):
         file_name = QFileDialog.getOpenFileName(self, "이미지 열기", "./")
@@ -418,78 +379,47 @@ class MainWindow(QMainWindow):
     def smaller(self):
         print("축소")
     
-    #회전(시계방향)
-    def rotation_clock(self): 
-        image = cv2.rotate(self.image, cv2.ROTATE_90_CLOCKWISE)
+    #회전
+    def rotation(self): #수정중
+        h, w, _ = self.image.shape
+        d90 = 90.0 * np.pi / 180.0 #90도
+        m90 = np.float32([
+            [np.cos(d90), -1*np.sin(d90), h],
+            [np.sin(d90), np.cos(d90), 0]
+        ])
+        r90 = cv2.warpAffine(self.image, m90, (h, w))
 
-        h, w, _ = image.shape
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(r90.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
 
-        print("시계방향 회전")
-    
-    #회전(반시계방향)
-    def rotation_counter(self):
-        image = cv2.rotate(self.image, cv2.ROTATE_90_COUNTERCLOCKWISE)
-
-        h, w, _ = image.shape
-        bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
-        pixmap = QPixmap(image)
-        self.label2.setPixmap(pixmap)
-
-        print("반시계방향 회전")
+        print("회전")
     
     #좌우반전
-    def flip(self):
+    def lr_flip(self):
         image = cv2.flip(self.image, 1) #1은 좌우반전을 의미
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
-        print("좌우반전")
 
     
-    def flip_v(self):
-        image = cv2.flip(self.image, 0) #0은 상하반전 의미
-        h, w, _ = image.shape #높이 너비 채널
-        bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
-        pixmap = QPixmap(image)
-        self.label2.setPixmap(pixmap)
+    def ud_flip(self):
         print("상하반전")
 
-    # def mouse_crop(event, x, y, flags, param):
-    #     global x1, y1, x2, y2, cropping
-
-    #     if event == cv2.EVENT_LBUTTONDOWN:
-    #         x1, y1, x2, y2 = x, y, x, y
-    #         cropping = True
-
-    #     elif event == cv2.EVENT_MOUSEMOVE:
-    #         if cropping == True:
-    #             x2, y2 = x, y
-    #     elif event == cv2.EVENT_LBUTTONUP:
-    #         x2, y2 = x, y
-    #         cropping = False
-    #         refPoint = [(x1, y1), (x2, y2)]
-
-    #         if len(refPoint) == 2:
-    #             roi = 
-    def crop(self):
+    def cut(self):
         print("자르기")
 
-    def circle_cut(self):
-        h, w = self.image.shape[:2]
+    def circle_cut(self): #수정중
+        h, w, _ = self.image.shape
         mask = np.zeros_like(self.image)
         cv2.circle(mask, (int(w/2), int(w/2)), int(w/2), (255, 255, 255), -1)
-        image = cv2.bitwise_and(self.image, mask)
+        cv2.bitwise_and(self.image, mask)
 
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(self.image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("원형 자르기")
@@ -501,27 +431,6 @@ class MainWindow(QMainWindow):
         print("리퀴파이")
 
     def distortion(self):
-        h, w = self.image.shape[:2]
-        exp = 2
-        scale = 1
-        mapy, mapx = np.indices((h, w), dtype=np.float32)
-
-        mapx = 2 * mapx / (w - 1) -1
-        mapy = 2 * mapy / (h - 1) -1
-
-        r, theta = cv2.cartToPolar(mapx, mapy) #직교좌표를 극좌표로 변환
-        r[r < scale] = r[r < scale] ** exp 
-
-        mapx, mapy = cv2.polarToCart(r, theta) #극좌표를 직교좌표로 변환
-        mapx = ((mapx + 1) * w - 1) /2 #좌상단으로 복귀
-        mapy = ((mapy + 1) * h - 1) / 2 
-
-        image = cv2.remap(self.image, mapx, mapy, cv2.INTER_LINEAR) #재매핑
-
-        bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
-        pixmap = QPixmap(image)
-        self.label2.setPixmap(pixmap)
         print("렌즈왜곡")
 
     def mosaic(self):
@@ -529,6 +438,9 @@ class MainWindow(QMainWindow):
 
     def compose(self):
         print("사진 합성")
+
+    def select(self):
+        print("배경 선택")
 
     def bright(self):
         print("밝기 조절")
@@ -609,7 +521,7 @@ class MainWindow(QMainWindow):
         
         print("로버츠 교차 필터")
 
-    def sobel_filter(self):
+    def sobel_filter(self): #수정중
         gx_kernel = np.array([[-1, 0, 1],[-2, 0, 2], [-1, 0, 1]]) 
         gy_kernel = np.array([[-1, -2, -1],[0, 0, 0], [1, 2, 1]]) 
 
@@ -627,28 +539,25 @@ class MainWindow(QMainWindow):
 
     def canny_edge(self): #수정중
         image = cv2.Canny(self.image, 50, 200)
+        h, w, _ = image.shape #높이 너비 채널
 
-        h, w = image.shape[:2] #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("캐니 엣지 필터")
 
-    #임계값은 100
-    def binary(self): #수정중
-        gray_image = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
-        ret_, image = cv2.threshold(gray_image, 100, 255, cv2.THRESH_BINARY)
-        
-        h, w = image.shape #높이 너비
-        bytes_per_line = 2 * w
-        # image = QImage(gray_image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
-        image = QImage(gray_image.data, w, h, bytes_per_line, QImage.Format_Grayscale8)
+    #임계값은 150
+    def binary(self):
+        image = cv2.threshold(self.image, 150, 255, cv2.THRESH_BINARY)
+        h, w, _ = image.shape #높이 너비 채널
+        bytes_per_line = 3 * w
+        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("binary")
 
-    def binary_inv(self): #수정중
+    def binary_inv(self):
         image = cv2.threshold(self.image, 150, 255, cv2.THRESH_BINARY_INV)
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
@@ -657,7 +566,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("binary_inv")
 
-    def trunc(self): #수정중
+    def trunc(self):
         image = cv2.threshold(self.image,150, 255, cv2.THRESH_TRUNC)
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
@@ -666,7 +575,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("trunc")
 
-    def tozero(self): #수정중
+    def tozero(self):
         image = cv2.threshold(self.image, 150, 255, cv2.THRESH_TOZERO)
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
@@ -674,8 +583,8 @@ class MainWindow(QMainWindow):
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("tozero")
- 
-    def tozero_inv(self): #수정중
+
+    def tozero_inv(self):
         image = cv2.threshold(self.image, 150, 255, cv2.THRESH_TOZERO_INV)
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
