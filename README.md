@@ -1,6 +1,11 @@
 ![header](https://capsule-render.vercel.app/api?type=waving&color=auto&height=300&section=header&text=Simple%20Photoshop&fontSize=90&animation=fadeIn&fontAlignY=38&desc=computer%20vision&descAlignY=51&descAlign=62)
 
 <p align='center'> IT융합공학과 2020101012 김소희 </p>
+<div align='center'> 
+        <img src = "https://img.shields.io/badge/opencv-%23white.svg?style=for-the-badge&logo=opencv&logoColor=white"/>
+        <img src = "https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white"/>
+        <img src = "https://img.shields.io/badge/Qt-%23217346.svg?style=for-the-badge&logo=Qt&logoColor=white"/>
+</div>
 
 ## 사용한 기술
 ![OpenCV](https://img.shields.io/badge/opencv-%23white.svg?style=for-the-badge&logo=opencv&logoColor=white)
@@ -43,7 +48,6 @@
 
 ## 기술 상세 설명
 <p>파일 열기</p>
-
 ``` python3
 def show_file_dialog(self):
         file_name = QFileDialog.getOpenFileName(self, "이미지 열기", "./")
@@ -54,4 +58,52 @@ def show_file_dialog(self):
         image = QImage(self.image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         pixmap = QPixmap(image)
         self.label1.setPixmap(pixmap)
+```
+
+<p></p>
+```python3
+```
+
+<p></p>
+```python3
+```
+
+<p></p>
+```python3
+```
+
+<p></p>
+```python3
+```
+
+<p></p>
+```python3
+```
+
+<p></p>
+```python3
+```
+
+<p></p>
+```python3
+```
+
+<p></p>
+```python3
+```
+
+<p></p>
+```python3
+```
+
+<p></p>
+```python3
+```
+
+<p></p>
+```python3
+```
+
+<p></p>
+```python3
 ```
