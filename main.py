@@ -149,10 +149,15 @@ class MainWindow(QMainWindow):
 
 
         #이미지
-        #렌즈 왜곡
-        distortion = QAction("렌즈 왜곡", self)
-        distortion.setStatusTip("렌즈 왜곡")
-        distortion.triggered.connect(self.distortion)
+        #볼록렌즈
+        convex = QAction("볼록렌즈", self)
+        convex.setStatusTip("볼록렌즈")
+        convex.triggered.connect(self.convex)
+
+        #오목렌즈
+        concave = QAction("오목렌즈", self)
+        concave.setStatusTip("오목렌즈")
+        concave.triggered.connect(self.concave)
 
     
         #색상
@@ -252,7 +257,8 @@ class MainWindow(QMainWindow):
         file_menu1.addAction(circle_cut)
 
         file_menu2 = menu.addMenu("&이미지 왜곡")
-        file_menu2.addAction(distortion)
+        file_menu2.addAction(convex)
+        file_menu2.addAction(concave)
 
 
         file_menu3 = menu.addMenu("&명암과 색상")
@@ -431,8 +437,8 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("원형 자르기")
 
-    #렌즈왜곡
-    def distortion(self):
+    #볼록렌즈
+    def convex(self):
         h, w = self.image.shape[:2]
         exp = 2
         scale = 1
@@ -455,8 +461,34 @@ class MainWindow(QMainWindow):
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
-        print("렌즈왜곡")
+        print("볼록렌즈")
 
+    #오목렌즈
+    def concave(self):
+        h, w = self.image.shape[:2]
+        exp = 0.5
+        scale = 1
+        mapy, mapx = np.indices((h, w), dtype=np.float32)
+
+        mapx = 2 * mapx / (w - 1) -1
+        mapy = 2 * mapy / (h - 1) -1
+
+        r, theta = cv2.cartToPolar(mapx, mapy) #직교좌표를 극좌표로 변환
+        r[r < scale] = r[r < scale] ** exp 
+
+        mapx, mapy = cv2.polarToCart(r, theta) #극좌표를 직교좌표로 변환
+        mapx = ((mapx + 1) * w - 1) /2 #좌상단으로 복귀
+        mapy = ((mapy + 1) * h - 1) / 2 
+
+        image = cv2.remap(self.image, mapx, mapy, cv2.INTER_LINEAR) #재매핑
+
+        bytes_per_line = 3 * w
+        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        pixmap = QPixmap(image)
+        self.label2.setPixmap(pixmap)
+        print("오목렌즈")
+        
     #명암 조절    
     def contrast(self):
         alpha = 1 #기울기
