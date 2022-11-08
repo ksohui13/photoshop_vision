@@ -33,7 +33,7 @@ class MainWindow(QMainWindow):
 
         exit = QAction(QIcon('./icons/close.png'), "나가기", self)
         exit.setStatusTip("나가기")
-        exit.triggered.connect(qApp.quit)
+        exit.triggered.connect(self.exit_window)
 
         self.statusBar()
 
@@ -102,7 +102,7 @@ class MainWindow(QMainWindow):
         exit_window = QAction(QIcon('./icons/close1.png'),"나가기", self)
         exit_window.setShortcut('Alt+F4')
         exit_window.setStatusTip("나가기")
-        exit_window.triggered.connect(qApp.quit)
+        exit_window.triggered.connect(self.exit_window)
 
         #기본 편집
         #확대
@@ -312,8 +312,21 @@ class MainWindow(QMainWindow):
         self.label1.setPixmap(pixmap)
     
     #작업 취소
-    def clear_label(self):
-        self.label2.clear()
+    def clear_label(self, event):
+        reply = QMessageBox.question(self, 'Message', '작업을 취소하시겠습니까?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.label2.clear()
+        else:
+            event.ignore()
+
+        
+    #나가기
+    def exit_window(self, event):
+        reply = QMessageBox.question(self, 'Message', '창을 닫으시겠습니까?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.close()
+        else:
+            event.ignore()
 
     #저장
     def save_file(self):
