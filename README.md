@@ -40,14 +40,3 @@
 | 바이래터널 필터 | 가우시안 필터와 경계필터를 결합하여 경계는 유지하며 노이즈 제거 |
 | 로버츠 교차 필터 | 사선 경계 검출 |
 | 소벨 필터 | x축, y축, 대각선 방향의 경계 검출 |
-def darkness(self):
-        val = 100
-        array = np.full(self.image.shape, (val, val, val), dtype=np.uint8)
-        image = cv2.subtract(self.image, array)
-        h, w, _ = image.shape #높이 너비 채널
-        bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
-        pixmap = QPixmap(image)
-        self.label2.setPixmap(pixmap)
-        print("어둡게")
-```
