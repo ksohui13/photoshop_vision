@@ -7,11 +7,6 @@
         <img src = "https://img.shields.io/badge/Qt-%23217346.svg?style=for-the-badge&logo=Qt&logoColor=white"/>
 </div>
 
-## 사용한 기술
-![OpenCV](https://img.shields.io/badge/opencv-%23white.svg?style=for-the-badge&logo=opencv&logoColor=white)
-![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white)
-![Qt](https://img.shields.io/badge/Qt-%23217346.svg?style=for-the-badge&logo=Qt&logoColor=white)
-
 ## 기능 개요
 | 기능 | 기능 설명 |
 | ------ |----------- |
@@ -48,6 +43,7 @@
 
 ## 기술 상세 설명
 <p>파일 열기</p>
+
 ``` python3
 def show_file_dialog(self):
         file_name = QFileDialog.getOpenFileName(self, "이미지 열기", "./")
@@ -60,50 +56,37 @@ def show_file_dialog(self):
         self.label1.setPixmap(pixmap)
 ```
 
-<p></p>
+<p>작업 취소</p>
+
 ```python3
+def clear_label(self, event):
+        reply = QMessageBox.question(self, 'Message', '작업을 취소하시겠습니까?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.label2.clear()
+        else:
+            event.ignore()
 ```
 
-<p></p>
+<p>나가기</p>
+
 ```python3
+def exit_window(self, event):
+        reply = QMessageBox.question(self, 'Message', '창을 닫으시겠습니까?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.close()
+        else:
+            event.ignore()
 ```
 
-<p></p>
-```python3
-```
+<p>확대</p>
 
-<p></p>
 ```python3
-```
-
-<p></p>
-```python3
-```
-
-<p></p>
-```python3
-```
-
-<p></p>
-```python3
-```
-
-<p></p>
-```python3
-```
-
-<p></p>
-```python3
-```
-
-<p></p>
-```python3
-```
-
-<p></p>
-```python3
-```
-
-<p></p>
-```python3
+def bigger(self):
+        h, w, _ = self.image.shape
+        image = cv2.pyrUp(self.image, dstsize=(w*2, h*2), borderType=cv2.BORDER_DEFAULT) #dtsize : 출력사이즈
+        bytes_per_line = 3 * w
+        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        pixmap = QPixmap(image)
+        self.label2.setPixmap(pixmap)
+        print("확대")
 ```
