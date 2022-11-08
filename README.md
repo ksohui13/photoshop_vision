@@ -1,6 +1,6 @@
 ![header](https://capsule-render.vercel.app/api?type=waving&color=auto&height=300&section=header&text=Simple%20Photoshop&fontSize=90&animation=fadeIn&fontAlignY=38&desc=computer%20vision&descAlignY=51&descAlign=62)
 
-#### IT융합공학과 2020101012 김소희
+<p align='center'> IT융합공학과 2020101012 김소희 </p>
 
 ## 사용한 기술
 ![OpenCV](https://img.shields.io/badge/opencv-%23white.svg?style=for-the-badge&logo=opencv&logoColor=white)
