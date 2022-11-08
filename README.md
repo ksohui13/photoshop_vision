@@ -44,7 +44,7 @@
 ## 기술 상세 설명
 <p>파일 열기</p>
 
-```
+``` python3
 def show_file_dialog(self):
         file_name = QFileDialog.getOpenFileName(self, "이미지 열기", "./")
         print(file_name)
