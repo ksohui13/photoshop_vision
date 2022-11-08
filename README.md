@@ -41,10 +41,9 @@
 | 로버츠 교차 필터 | 사선 경계 검출 |
 | 소벨 필터 | x축, y축, 대각선 방향의 경계 검출 |
 
-#### 기술 상세 설명
+## 기술 상세 설명
 <p>파일 열기</p>
-python:
-```
+```python
 def show_file_dialog(self):
         file_name = QFileDialog.getOpenFileName(self, "이미지 열기", "./")
         print(file_name)
