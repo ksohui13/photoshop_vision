@@ -15,9 +15,6 @@ class MainWindow(QMainWindow):
 
 #내부 UI
     def initUI(self):
-        #배경색
-        # self.setStyleSheet("background-color: #E7E9EC;")
-
         #toolbar-기능
         open_file = QAction(QIcon('./icons/open4.png'),"파일 열기", self)
         open_file.setStatusTip("파일 열기")
@@ -78,8 +75,6 @@ class MainWindow(QMainWindow):
         main_layout.addLayout(sidebar)
 
         #----- 기능 ------
-        
-
         #파일
         #파일 열기
         show_file_dialog = QAction(QIcon('./icons/folder.png'), "파일 열기", self)
@@ -390,7 +385,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("좌우반전")
 
-    
+    #상하반전
     def flip_v(self):
         image = cv2.flip(self.image, 0) #0은 상하반전 의미
         h, w, _ = image.shape #높이 너비 채널
@@ -400,6 +395,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("상하반전")
 
+    #자르기
     def crop(self):
         image = self.image[100:600, 200:700].copy()
         h, w, _ = image.shape #높이 너비 채널
@@ -409,6 +405,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("자르기")
 
+    #원형 자르기
     def circle_cut(self):
         h, w = self.image.shape[:2]
         mask = np.zeros_like(self.image)
@@ -421,6 +418,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("원형 자르기")
 
+    #렌즈왜곡
     def distortion(self):
         h, w = self.image.shape[:2]
         exp = 2
@@ -444,7 +442,8 @@ class MainWindow(QMainWindow):
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("렌즈왜곡")
-        
+
+    #명암 조절    
     def contrast(self):
         alpha = 1 #기울기
         image = np.clip(((1 + alpha)*self.image - 128*alpha), 0, 255).astype(np.uint8)
@@ -456,6 +455,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("명암 조절")
 
+    #밝게
     def bright(self):
         val = 100
         array = np.full(self.image.shape, (val, val, val), dtype=np.uint8)
@@ -467,6 +467,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("밝게")
 
+    #어둡게
     def darkness(self):
         val = 100
         array = np.full(self.image.shape, (val, val, val), dtype=np.uint8)
@@ -478,6 +479,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("어둡게")
 
+    #색상 반전
     def color_inversion(self):
         h, w, _ = self.image.shape #높이 너비 채널
         bytes_per_line = 3 * w
@@ -486,6 +488,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("색상 반전")
 
+    #역상
     def corlor_reverse(self):
         image = cv2.bitwise_not(self.image)
         h, w, _ = image.shape #높이 너비 채널
@@ -495,6 +498,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("역상")
 
+    #흑백
     def gray_scale(self):
         image = cv2.cvtColor(self.image, cv2.COLOR_RGB2GRAY)
         h, w = image.shape #높이 너비 채널
@@ -504,6 +508,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("흑백")
 
+    #샤픈
     def sharpen(self):
         kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
         image = cv2.filter2D(self.image, -1, kernel)
@@ -514,6 +519,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("sharpen")
 
+    #흑백
     def blur(self):
         kernel = np.full((5, 5), 0.04)
         image = cv2.filter2D(self.image, -1, kernel)
@@ -525,6 +531,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("블러")
 
+    #가우시안 블러
     def gaussian_blur(self):
         kernel = np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]]) * (1/ 16)
         image = cv2.filter2D(self.image, -1, kernel)
@@ -536,6 +543,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("가우시안 블러")
 
+    #미디언 블러링
     def median_blur(self):
         image = cv2.medianBlur(self.image, 5)
 
@@ -546,6 +554,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("미디언 블러링")
 
+    #바이래터럴 필터
     def bilateral_filter(self):
         image = cv2.bilateralFilter(self.image, 5, 75, 75)
 
@@ -556,6 +565,7 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("바이래터널 필터")
 
+    #로버츠 교차 필터
     def roberts_filter(self):
         gx_kernel = np.array([[1, 0],[0, -1]]) #x축의 경계만 나옴
         gy_kernel = np.array([[0, 1],[-1, 0]]) #y축의 경계만 나옴
@@ -573,6 +583,7 @@ class MainWindow(QMainWindow):
         
         print("로버츠 교차 필터")
 
+    #소벨 필터
     def sobel_filter(self):
         gx_kernel = np.array([[-1, 0, 1],[-2, 0, 2], [-1, 0, 1]]) 
         gy_kernel = np.array([[-1, -2, -1],[0, 0, 0], [1, 2, 1]]) 

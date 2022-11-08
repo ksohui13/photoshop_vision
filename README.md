@@ -40,53 +40,14 @@
 | 바이래터널 필터 | 가우시안 필터와 경계필터를 결합하여 경계는 유지하며 노이즈 제거 |
 | 로버츠 교차 필터 | 사선 경계 검출 |
 | 소벨 필터 | x축, y축, 대각선 방향의 경계 검출 |
-
-## 기술 상세 설명
-<h4>파일 열기</h4>
-
-``` python3
-def show_file_dialog(self):
-        file_name = QFileDialog.getOpenFileName(self, "이미지 열기", "./")
-        print(file_name)
-        self.image = cv2.imread(file_name[0]) #튜플 형태: 파일 주소
-        h, w, _ = self.image.shape #높이 너비 채널
-        bytes_per_line = 3 * w
-        image = QImage(self.image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
-        pixmap = QPixmap(image)
-        self.label1.setPixmap(pixmap)
-```
-
-<h4>작업 취소</h4>
-
-```python3
-def clear_label(self, event):
-        reply = QMessageBox.question(self, 'Message', '작업을 취소하시겠습니까?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            self.label2.clear()
-        else:
-            event.ignore()
-```
-
-<h4>나가기</h4>
-
-```python3
-def exit_window(self, event):
-        reply = QMessageBox.question(self, 'Message', '창을 닫으시겠습니까?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            self.close()
-        else:
-            event.ignore()
-```
-
-<h4>확대</h4>
-
-```python3
-def bigger(self):
-        h, w, _ = self.image.shape
-        image = cv2.pyrUp(self.image, dstsize=(w*2, h*2), borderType=cv2.BORDER_DEFAULT) #dtsize : 출력사이즈
+def darkness(self):
+        val = 100
+        array = np.full(self.image.shape, (val, val, val), dtype=np.uint8)
+        image = cv2.subtract(self.image, array)
+        h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
-        print("확대")
+        print("어둡게")
 ```
