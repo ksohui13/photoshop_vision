@@ -1,5 +1,5 @@
 import sys, cv2
-import numpy as np
+import numpy as np 
 from PySide6.QtGui import QAction, QImage, QPixmap, QIcon
 from PySide6.QtWidgets import (QApplication,QWidget, QLabel, 
 QMainWindow, QHBoxLayout, QVBoxLayout, 
@@ -58,12 +58,11 @@ class MainWindow(QMainWindow):
 
         #사이드바 메뉴버튼
         sidebar = QVBoxLayout()
-        # sidebar.style("border-style: solid; border-width:2px; border-color: white;")
         button1 = QPushButton("회전(90)")
         button2 = QPushButton("회전(-90)")
         button3 = QPushButton("좌우반전")
         button4 = QPushButton("상하반전")
-        # button5 = QPushButton("나가기")
+        button5 = QPushButton("글씨 쓰기")
         # #사이드바 메뉴-기능 연결
         button1.clicked.connect(self.rotation_clock) 
         button2.clicked.connect(self.rotation_counter)
@@ -74,11 +73,13 @@ class MainWindow(QMainWindow):
         sidebar.addWidget(button2)
         sidebar.addWidget(button3)
         sidebar.addWidget(button4)
-        # sidebar.addWidget(button5)
+        sidebar.addWidget(button5)
 
         main_layout.addLayout(sidebar)
 
         #----- 기능 ------
+        
+
         #파일
         #파일 열기
         show_file_dialog = QAction(QIcon('./icons/folder.png'), "파일 열기", self)
@@ -162,8 +163,8 @@ class MainWindow(QMainWindow):
         contrast.triggered.connect(self.contrast)
 
         #밝기 조절
-        bright = QAction("밝기 조절", self)
-        bright.setStatusTip("밝기 조절")
+        bright = QAction("밝게", self)
+        bright.setStatusTip("밝게")
         bright.triggered.connect(self.bright) 
 
         #어둡게
@@ -224,12 +225,6 @@ class MainWindow(QMainWindow):
         sobel_filter.setStatusTip("소벨 필터")
         sobel_filter.triggered.connect(self.sobel_filter)
 
-        # #선택
-        # select = QAction("선택", self)
-        # select.setStatusTip("선택")
-        # select.triggered.connect(self.select)
-
-
         #---드랍메뉴 추가---
         self.setStatusBar(QStatusBar(self))
 
@@ -244,15 +239,14 @@ class MainWindow(QMainWindow):
         file_menu1 = menu.addMenu("&기본 편집") #메뉴바에 메뉴 추가
         file_menu1.addAction(bigger)
         file_menu1.addAction(smaller)
-        #분할선 추가
-        separator = QAction(self)
+        separator = QAction(self) #분할선 추가
         separator.setSeparator(True)
         file_menu1.addAction(separator)
         file_menu1.addAction(rotation_clock)
         file_menu1.addAction(rotation_counter)
         file_menu1.addAction(flip)
         file_menu1.addAction(flip_v)
-        separator = QAction(self)
+        separator = QAction(self)#분할선 추가
         separator.setSeparator(True)
         file_menu1.addAction(separator)
         file_menu1.addAction(crop)
@@ -330,16 +324,18 @@ class MainWindow(QMainWindow):
 
     #저장
     def save_file(self):
-        if self.label2 is None == False: #만약 사진이 있다면 #무슨 레이어를 인식하는거지..?
-            #파일 저장 이름 받기
-            image_file, _ = QFileDialog.getSaveFileName(self, "Save Image", "","PNG Files (*.png);;JPG Files (*.jpeg *.jpg );;")
-            if image_file and self.image is None == False:
-                self.image.save(image_file)
-            else:
-                QMessageBox.information(self, "Error", "이미지를 저장 할 수 없습니다.", QMessageBox.Ok)
-        else:
-            QMessageBox.information(self, "이미지 없음", "저장 할 이미지가 없습니다.", QMessageBox.Ok)
+        QMessageBox.question(self, 'Message', '기능 업데이트 중입니다', QMessageBox.Ok)
+        # if self.label2 is None == False: #만약 사진이 있다면 #무슨 레이어를 인식하는거지..?
+        #     #파일 저장 이름 받기
+        #     image_file, _ = QFileDialog.getSaveFileName(self, "Save Image", "","PNG Files (*.png);;JPG Files (*.jpeg *.jpg );;")
+        #     if image_file and self.image is None == False:
+        #         self.image.save(image_file)
+        #     else:
+        #         QMessageBox.information(self, "Error", "이미지를 저장 할 수 없습니다.", QMessageBox.Ok)
+        # else:
+        #     QMessageBox.information(self, "이미지 없음", "저장 할 이미지가 없습니다.", QMessageBox.Ok)
         print("저장")
+
 
     #확대
     def bigger(self):
