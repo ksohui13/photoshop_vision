@@ -4,6 +4,7 @@ from PySide6.QtGui import QAction, QImage, QPixmap, QIcon
 from PySide6.QtWidgets import (QApplication,QWidget, QLabel, 
 QMainWindow, QHBoxLayout, QVBoxLayout, 
 QPushButton, QFileDialog, QToolBar, QStatusBar, QMessageBox)
+from PySide6.QtCore import Qt
 
 
 class MainWindow(QMainWindow):
@@ -55,11 +56,15 @@ class MainWindow(QMainWindow):
 
         #사이드바 메뉴버튼
         sidebar = QVBoxLayout()
+        sidebar.setContentsMargins(20, 100, 50, 100) #sidebar 마진 설정 #왼, 위, 오, 아
         button1 = QPushButton("회전(90)")
+        button1.setFixedHeight(50) #버튼 높이 고정
         button2 = QPushButton("회전(-90)")
+        button2.setFixedHeight(50)
         button3 = QPushButton("좌우반전")
+        button3.setFixedHeight(50)
         button4 = QPushButton("상하반전")
-        button5 = QPushButton("글씨 쓰기")
+        button4.setFixedHeight(50)
         # #사이드바 메뉴-기능 연결
         button1.clicked.connect(self.rotation_clock) 
         button2.clicked.connect(self.rotation_counter)
@@ -70,7 +75,6 @@ class MainWindow(QMainWindow):
         sidebar.addWidget(button2)
         sidebar.addWidget(button3)
         sidebar.addWidget(button4)
-        sidebar.addWidget(button5)
 
         main_layout.addLayout(sidebar)
 
@@ -277,7 +281,7 @@ class MainWindow(QMainWindow):
         
         #메인 화면 구성
         self.label1 = QLabel(self)
-        self.label1.setFixedSize(640, 480) #사이즈 고정
+        # self.label1.setFixedSize(640, 480) #사이즈 고정
         main_layout.addWidget(self.label1)
 
         self.label2 = QLabel(self)
@@ -297,6 +301,7 @@ class MainWindow(QMainWindow):
         h, w, _ = self.image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(self.image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label1.setAlignment(Qt.AlignmentFlag.AlignCenter) #이미지 중앙정렬
         pixmap = QPixmap(image)
         self.label1.setPixmap(pixmap)
     
@@ -338,6 +343,7 @@ class MainWindow(QMainWindow):
         image = cv2.pyrUp(self.image, dstsize=(w*2, h*2), borderType=cv2.BORDER_DEFAULT) #dtsize : 출력사이즈
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("확대")
@@ -348,6 +354,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
 
@@ -359,6 +366,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
 
@@ -370,6 +378,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
 
@@ -381,6 +390,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("좌우반전")
@@ -391,6 +401,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("상하반전")
@@ -401,6 +412,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("자르기")
@@ -414,6 +426,7 @@ class MainWindow(QMainWindow):
 
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("원형 자르기")
@@ -439,6 +452,7 @@ class MainWindow(QMainWindow):
 
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("렌즈왜곡")
@@ -451,6 +465,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("명암 조절")
@@ -463,6 +478,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("밝게")
@@ -475,6 +491,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("어둡게")
@@ -484,6 +501,7 @@ class MainWindow(QMainWindow):
         h, w, _ = self.image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(self.image.data, w, h, bytes_per_line, QImage.Format_BGR888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("색상 반전")
@@ -494,6 +512,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888)
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("역상")
@@ -504,6 +523,7 @@ class MainWindow(QMainWindow):
         h, w = image.shape #높이 너비 채널
         bytes_per_line = 1 * w #흑백은 1차원 이미지
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_Grayscale8)
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("흑백")
@@ -515,6 +535,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("sharpen")
@@ -527,6 +548,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("블러")
@@ -539,6 +561,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("가우시안 블러")
@@ -550,6 +573,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("미디언 블러링")
@@ -561,6 +585,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("바이래터널 필터")
@@ -578,6 +603,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         
@@ -596,6 +622,7 @@ class MainWindow(QMainWindow):
         h, w, _ = image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("소벨 필터")
