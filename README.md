@@ -42,7 +42,7 @@
 | 소벨 필터 | x축, y축, 대각선 방향의 경계 검출 |
 
 ## 기술 상세 설명
-<p>파일 열기</p>
+<h3>파일 열기</h3>
 
 ``` python3
 def show_file_dialog(self):
