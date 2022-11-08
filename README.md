@@ -42,3 +42,16 @@
 | 소벨 필터 | x축, y축, 대각선 방향의 경계 검출 |
 
 #### 기술 상세 설명
+<p>파일 열기</p>
+python:
+```
+def show_file_dialog(self):
+        file_name = QFileDialog.getOpenFileName(self, "이미지 열기", "./")
+        print(file_name)
+        self.image = cv2.imread(file_name[0]) #튜플 형태: 파일 주소
+        h, w, _ = self.image.shape #높이 너비 채널
+        bytes_per_line = 3 * w
+        image = QImage(self.image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        pixmap = QPixmap(image)
+        self.label1.setPixmap(pixmap)
+```
