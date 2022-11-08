@@ -1,4 +1,4 @@
-![header](https://capsule-render.vercel.app/api?type=waving&color=auto&height=300&section=header&text=Simple%20Photoshop&fontSize=90&animation=fadeIn&fontAlignY=38&desc=IT융합공학과%202020101012%20김소희&descAlignY=51&descAlign=62)
+![header](https://capsule-render.vercel.app/api?type=waving&color=9&height=300&section=header&text=Simple%20Photoshop&fontSize=90&animation=fadeIn&fontAlignY=38&desc=computer%20vision&descAlignY=51&descAlign=62)
 
 #### IT융합공학과 2020101012 김소희
 
