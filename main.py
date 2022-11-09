@@ -158,7 +158,6 @@ class MainWindow(QMainWindow):
         concave = QAction("오목렌즈", self)
         concave.setStatusTip("오목렌즈")
         concave.triggered.connect(self.concave)
-
     
         #색상
         #명암 조절
@@ -260,7 +259,6 @@ class MainWindow(QMainWindow):
         file_menu2.addAction(convex)
         file_menu2.addAction(concave)
 
-
         file_menu3 = menu.addMenu("&명암과 색상")
         file_menu3.addAction(bright)
         file_menu3.addAction(darkness)
@@ -346,7 +344,9 @@ class MainWindow(QMainWindow):
     #확대
     def bigger(self):
         h, w, _ = self.image.shape
-        image = cv2.pyrUp(self.image, dstsize=(w*2, h*2), borderType=cv2.BORDER_DEFAULT) #dtsize : 출력사이즈
+        # image = cv2.pyrUp(self.image, dstsize=(w*2, h*2), borderType=cv2.BORDER_DEFAULT) #dtsize : 출력사이즈
+        image = cv2.resize(self.image, None,  None, 2, 2, cv2.INTER_CUBIC)
+        
         bytes_per_line = 3 * w
         image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -488,7 +488,8 @@ class MainWindow(QMainWindow):
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("오목렌즈")
-        
+
+
     #명암 조절    
     def contrast(self):
         alpha = 1 #기울기
