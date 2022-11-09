@@ -44,4 +44,5 @@
 
 ## 기능 설명
 #### 원형자르기
-![circle] (./result_image/circle.png)
+
+![circle] (/result_image/circle.png)
