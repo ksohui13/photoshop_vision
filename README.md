@@ -41,3 +41,25 @@
 | 바이래터널 필터 | 가우시안 필터와 경계필터를 결합하여 경계는 유지하며 노이즈 제거 |
 | 로버츠 교차 필터 | 사선 경계 검출 |
 | 소벨 필터 | x축, y축, 대각선 방향의 경계 검출 |
+
+## 기능 설명
+
+#### 1. 원형자르기
+- 사진을 원형으로 자르고 이외 부분은 검정색으로 처리
+![원형자르기](https://user-images.githubusercontent.com/111819641/200733614-9b57f70a-9be5-466b-8bc8-1666051463ac.png)
+
+#### 2. 오목렌즈
+- 사진 중앙을 중심으로 오목렌즈 효과
+![오목렌즈](https://user-images.githubusercontent.com/111819641/200733675-fa4e388f-f1f9-4701-9acb-aa4604ea7b67.png)
+
+#### 3. 역상
+- bitwise not연산을 통해 이미지 값을 반대로 바꿈
+![역상](https://user-images.githubusercontent.com/111819641/200733710-76ab3031-49d4-434f-b9e4-f5ce54ad8760.png)
+
+#### 4. 미디언블러링
+- kernel 픽셀 값 중 중앙 값을 선택하여 잡음 제거
+![미디언 블러링](https://user-images.githubusercontent.com/111819641/200733737-f67a1b62-84b0-4f14-8313-95e5703f414c.png)
+
+#### 5. 소벨필터
+- x축, y축, 대각선 방향의 경계 검출
+![소벨필터](https://user-images.githubusercontent.com/111819641/200733759-639bc29f-060a-4d22-a8ee-67f4de41e8e3.png)
