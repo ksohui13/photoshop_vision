@@ -43,6 +43,18 @@
 | 소벨 필터 | x축, y축, 대각선 방향의 경계 검출 |
 
 ## 기능 설명
-#### 원형자르기
 
-![circle] (/result_image/circle.png)
+#### 1. 원형자르기
+![원형자르기](https://user-images.githubusercontent.com/111819641/200733614-9b57f70a-9be5-466b-8bc8-1666051463ac.png)
+
+#### 2. 오목렌즈
+![오목렌즈](https://user-images.githubusercontent.com/111819641/200733675-fa4e388f-f1f9-4701-9acb-aa4604ea7b67.png)
+
+#### 3. 역상
+![역상](https://user-images.githubusercontent.com/111819641/200733710-76ab3031-49d4-434f-b9e4-f5ce54ad8760.png)
+
+#### 4. 미디언블러링
+![미디언 블러링](https://user-images.githubusercontent.com/111819641/200733737-f67a1b62-84b0-4f14-8313-95e5703f414c.png)
+
+#### 5. 소벨필터
+![소벨필터](https://user-images.githubusercontent.com/111819641/200733759-639bc29f-060a-4d22-a8ee-67f4de41e8e3.png)
