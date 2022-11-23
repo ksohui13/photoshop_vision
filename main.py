@@ -158,6 +158,11 @@ class MainWindow(QMainWindow):
         concave = QAction("오목렌즈", self)
         concave.setStatusTip("오목렌즈")
         concave.triggered.connect(self.concave)
+
+        #모자이크
+        mosaic = QAction("모자이크", self)
+        mosaic.setStatusTip("모자이크")
+        mosaic.triggered.connect(self.mosaic)
     
         #색상
         #명암 조절
@@ -258,6 +263,7 @@ class MainWindow(QMainWindow):
         file_menu2 = menu.addMenu("&이미지 왜곡")
         file_menu2.addAction(convex)
         file_menu2.addAction(concave)
+        file_menu2.addAction(mosaic)
 
         file_menu3 = menu.addMenu("&명암과 색상")
         file_menu3.addAction(bright)
@@ -489,6 +495,23 @@ class MainWindow(QMainWindow):
         self.label2.setPixmap(pixmap)
         print("오목렌즈")
 
+    #모자이크
+    def mosaic(self):
+        QMessageBox.information(self, "CHECK", "영역 지정 후 ENTER버튼을 눌러주세요", QMessageBox.Ok)
+        x, y, width, height = cv2.selectROI("위치", self.image, False)
+        mosaic_loc = self.image[y : y+height, x : x + width ]
+        mosaic_loc = cv2.blur(mosaic_loc, (50, 50))
+        image = self.image
+        image[y : y+height, x : x + width] = mosaic_loc
+        cv2.destroyAllWindows()
+        
+        h, w = self.image.shape[:2]
+        bytes_per_line = 3 * w
+        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        pixmap = QPixmap(image)
+        self.label2.setPixmap(pixmap)
+        print("모자이크")
 
     #명암 조절    
     def contrast(self):
