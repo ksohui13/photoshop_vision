@@ -1,4 +1,5 @@
 import sys, cv2
+import cvlib as cv
 import numpy as np 
 from PySide6.QtGui import QAction, QImage, QPixmap, QIcon
 from PySide6.QtWidgets import (QApplication,QWidget, QLabel, 
@@ -163,6 +164,7 @@ class MainWindow(QMainWindow):
         mosaic = QAction("모자이크", self)
         mosaic.setStatusTip("모자이크")
         mosaic.triggered.connect(self.mosaic)
+
     
         #색상
         #명암 조절
@@ -305,9 +307,14 @@ class MainWindow(QMainWindow):
 #------기능 관련 함수 -----
     #파일 불러오기
     def show_file_dialog(self):
+        global file_name
         file_name = QFileDialog.getOpenFileName(self, "이미지 열기", "./")
         print(file_name)
         self.image = cv2.imread(file_name[0]) #튜플 형태: 파일 주소
+
+        global update
+        update = self.image
+
         h, w, _ = self.image.shape #높이 너비 채널
         bytes_per_line = 3 * w
         image = QImage(self.image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
@@ -317,9 +324,11 @@ class MainWindow(QMainWindow):
     
     #작업 취소
     def clear_label(self, event):
+        global update
         reply = QMessageBox.question(self, 'Message', '작업을 취소하시겠습니까?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             self.label2.clear()
+            update = self.image
         else:
             event.ignore()
 
@@ -334,27 +343,22 @@ class MainWindow(QMainWindow):
 
     #저장
     def save_file(self):
-        QMessageBox.question(self, 'Message', '기능 업데이트 중입니다', QMessageBox.Ok)
-        # if self.label2 is None == False: #만약 사진이 있다면 #무슨 레이어를 인식하는거지..?
-        #     #파일 저장 이름 받기
-        #     image_file, _ = QFileDialog.getSaveFileName(self, "Save Image", "","PNG Files (*.png);;JPG Files (*.jpeg *.jpg );;")
-        #     if image_file and self.image is None == False:
-        #         self.image.save(image_file)
-        #     else:
-        #         QMessageBox.information(self, "Error", "이미지를 저장 할 수 없습니다.", QMessageBox.Ok)
-        # else:
-        #     QMessageBox.information(self, "이미지 없음", "저장 할 이미지가 없습니다.", QMessageBox.Ok)
+        global update
+        filename = QFileDialog.getSaveFileName(filter="JPG(*.jpg);;PNG(*.png);;TIFF(*.tiff);;BMP(*.bmp)")[0]
+        cv2.imwrite(filename,update)
+        QMessageBox.information(self, "저장 성공!", "이미지를 성공적으로 저장하였습니다.", QMessageBox.Ok)
         print("저장")
 
 
     #확대
     def bigger(self):
+        global update
         h, w, _ = self.image.shape
         # image = cv2.pyrUp(self.image, dstsize=(w*2, h*2), borderType=cv2.BORDER_DEFAULT) #dtsize : 출력사이즈
-        image = cv2.resize(self.image, None,  None, 2, 2, cv2.INTER_CUBIC)
+        update = cv2.resize(update, None,  None, 2, 2, cv2.INTER_CUBIC)
         
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -362,10 +366,12 @@ class MainWindow(QMainWindow):
     
     #축소
     def smaller(self):
-        image = cv2.pyrDown(self.image) #이미지 2배로 축소
-        h, w, _ = image.shape
+        global update
+        update= cv2.pyrDown(update) #이미지 2배로 축소
+
+        h, w, _ = update.shape
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -374,10 +380,11 @@ class MainWindow(QMainWindow):
     
     #회전(시계방향)
     def rotation_clock(self): 
-        image = cv2.rotate(self.image, cv2.ROTATE_90_CLOCKWISE)
-        h, w, _ = image.shape
+        global update
+        update = cv2.rotate(update, cv2.ROTATE_90_CLOCKWISE)
+        h, w, _ = update.shape
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -386,10 +393,11 @@ class MainWindow(QMainWindow):
     
     #회전(반시계방향)
     def rotation_counter(self):
-        image = cv2.rotate(self.image, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        h, w, _ = image.shape
+        global update
+        update = cv2.rotate(update, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        h, w, _ = update.shape
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -398,10 +406,13 @@ class MainWindow(QMainWindow):
     
     #좌우반전
     def flip(self):
-        image = cv2.flip(self.image, 1) #1은 좌우반전을 의미
-        h, w, _ = image.shape #높이 너비 채널
+        global update
+        
+        update = cv2.flip(update, 1) #1은 좌우반전을 의미
+        h, w, _ = update.shape #높이 너비 채널
+
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -409,10 +420,11 @@ class MainWindow(QMainWindow):
 
     #상하반전
     def flip_v(self):
-        image = cv2.flip(self.image, 0) #0은 상하반전 의미
-        h, w, _ = image.shape #높이 너비 채널
+        global update
+        update = cv2.flip(update, 0) #0은 상하반전 의미
+        h, w, _ = update.shape #높이 너비 채널
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -420,10 +432,11 @@ class MainWindow(QMainWindow):
 
     #자르기
     def crop(self):
-        image = self.image[100:600, 200:700].copy()
-        h, w, _ = image.shape #높이 너비 채널
+        global update
+        update = update[100:600, 200:700].copy()
+        h, w, _ = update.shape #높이 너비 채널
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -431,13 +444,14 @@ class MainWindow(QMainWindow):
 
     #원형 자르기
     def circle_cut(self):
-        h, w = self.image.shape[:2]
-        mask = np.zeros_like(self.image)
+        global update
+        h, w = update.shape[:2]
+        mask = np.zeros_like(update)
         cv2.circle(mask, (int(w/2), int(w/2)), int(w/2), (255, 255, 255), -1)
-        image = cv2.bitwise_and(self.image, mask)
+        update = cv2.bitwise_and(update, mask)
 
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -445,7 +459,8 @@ class MainWindow(QMainWindow):
 
     #볼록렌즈
     def convex(self):
-        h, w = self.image.shape[:2]
+        global update
+        h, w = update.shape[:2]
         exp = 2
         scale = 1
         mapy, mapx = np.indices((h, w), dtype=np.float32)
@@ -460,10 +475,10 @@ class MainWindow(QMainWindow):
         mapx = ((mapx + 1) * w - 1) /2 #좌상단으로 복귀
         mapy = ((mapy + 1) * h - 1) / 2 
 
-        image = cv2.remap(self.image, mapx, mapy, cv2.INTER_LINEAR) #재매핑
+        update = cv2.remap(update, mapx, mapy, cv2.INTER_LINEAR) #재매핑
 
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -471,7 +486,8 @@ class MainWindow(QMainWindow):
 
     #오목렌즈
     def concave(self):
-        h, w = self.image.shape[:2]
+        global update
+        h, w = update.shape[:2]
         exp = 0.5
         scale = 1
         mapy, mapx = np.indices((h, w), dtype=np.float32)
@@ -486,10 +502,10 @@ class MainWindow(QMainWindow):
         mapx = ((mapx + 1) * w - 1) /2 #좌상단으로 복귀
         mapy = ((mapy + 1) * h - 1) / 2 
 
-        image = cv2.remap(self.image, mapx, mapy, cv2.INTER_LINEAR) #재매핑
+        update = cv2.remap(update, mapx, mapy, cv2.INTER_LINEAR) #재매핑
 
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -497,17 +513,17 @@ class MainWindow(QMainWindow):
 
     #모자이크
     def mosaic(self):
+        global update
         QMessageBox.information(self, "CHECK", "영역 지정 후 ENTER버튼을 눌러주세요", QMessageBox.Ok)
-        x, y, width, height = cv2.selectROI("위치", self.image, False)
-        mosaic_loc = self.image[y : y+height, x : x + width ]
+        x, y, width, height = cv2.selectROI("위치", update, False)
+        mosaic_loc = update[y : y+height, x : x + width ]
         mosaic_loc = cv2.blur(mosaic_loc, (50, 50))
-        image = self.image
-        image[y : y+height, x : x + width] = mosaic_loc
+        update[y : y+height, x : x + width] = mosaic_loc
         cv2.destroyAllWindows()
         
-        h, w = self.image.shape[:2]
+        h, w = update.shape[:2]
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -515,12 +531,13 @@ class MainWindow(QMainWindow):
 
     #명암 조절    
     def contrast(self):
+        global update
         alpha = 1 #기울기
-        image = np.clip(((1 + alpha)*self.image - 128*alpha), 0, 255).astype(np.uint8)
+        update = np.clip(((1 + alpha)*update - 128*alpha), 0, 255).astype(np.uint8)
 
-        h, w, _ = image.shape #높이 너비 채널
+        h, w, _ = update.shape #높이 너비 채널
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -528,12 +545,13 @@ class MainWindow(QMainWindow):
 
     #밝게
     def bright(self):
+        global update
         val = 100
-        array = np.full(self.image.shape, (val, val, val), dtype=np.uint8)
-        image = cv2.add(self.image, array)
-        h, w, _ = image.shape #높이 너비 채널
+        array = np.full(update.shape, (val, val, val), dtype=np.uint8)
+        update = cv2.add(update, array)
+        h, w, _ = update.shape #높이 너비 채널
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -541,12 +559,13 @@ class MainWindow(QMainWindow):
 
     #어둡게
     def darkness(self):
+        global update
         val = 100
-        array = np.full(self.image.shape, (val, val, val), dtype=np.uint8)
-        image = cv2.subtract(self.image, array)
-        h, w, _ = image.shape #높이 너비 채널
+        array = np.full(update.shape, (val, val, val), dtype=np.uint8)
+        update = cv2.subtract(update, array)
+        h, w, _ = update.shape #높이 너비 채널
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -554,9 +573,10 @@ class MainWindow(QMainWindow):
 
     #색상 반전
     def color_inversion(self):
-        h, w, _ = self.image.shape #높이 너비 채널
+        global update
+        h, w, _ = update.shape #높이 너비 채널
         bytes_per_line = 3 * w
-        image = QImage(self.image.data, w, h, bytes_per_line, QImage.Format_BGR888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_BGR888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -564,10 +584,11 @@ class MainWindow(QMainWindow):
 
     #역상
     def corlor_reverse(self):
-        image = cv2.bitwise_not(self.image)
-        h, w, _ = image.shape #높이 너비 채널
+        global update
+        update = cv2.bitwise_not(update)
+        h, w, _ = update.shape #높이 너비 채널
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888)
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888)
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -575,10 +596,11 @@ class MainWindow(QMainWindow):
 
     #흑백
     def gray_scale(self):
-        image = cv2.cvtColor(self.image, cv2.COLOR_RGB2GRAY)
-        h, w = image.shape #높이 너비 채널
+        global update
+        update = cv2.cvtColor(update, cv2.COLOR_RGB2GRAY)
+        h, w = update.shape #높이 너비 채널
         bytes_per_line = 1 * w #흑백은 1차원 이미지
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_Grayscale8)
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_Grayscale8)
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -586,24 +608,26 @@ class MainWindow(QMainWindow):
 
     #샤픈
     def sharpen(self):
+        global update
         kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
-        image = cv2.filter2D(self.image, -1, kernel)
-        h, w, _ = image.shape #높이 너비 채널
+        update = cv2.filter2D(update, -1, kernel)
+        h, w, _ = update.shape #높이 너비 채널
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
         print("sharpen")
 
-    #흑백
+    #블러
     def blur(self):
+        global update
         kernel = np.full((5, 5), 0.04)
-        image = cv2.filter2D(self.image, -1, kernel)
+        update = cv2.filter2D(update, -1, kernel)
 
-        h, w, _ = image.shape #높이 너비 채널
+        h, w, _ = update.shape #높이 너비 채널
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -611,12 +635,13 @@ class MainWindow(QMainWindow):
 
     #가우시안 블러
     def gaussian_blur(self):
+        global update
         kernel = np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]]) * (1/ 16)
-        image = cv2.filter2D(self.image, -1, kernel)
+        update = cv2.filter2D(update, -1, kernel)
 
-        h, w, _ = image.shape #높이 너비 채널
+        h, w, _ = update.shape #높이 너비 채널
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -624,11 +649,12 @@ class MainWindow(QMainWindow):
 
     #미디언 블러링
     def median_blur(self):
-        image = cv2.medianBlur(self.image, 5)
+        global update
+        update = cv2.medianBlur(update, 5)
 
-        h, w, _ = image.shape #높이 너비 채널
+        h, w, _ = update.shape #높이 너비 채널
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -636,11 +662,12 @@ class MainWindow(QMainWindow):
 
     #바이래터럴 필터
     def bilateral_filter(self):
-        image = cv2.bilateralFilter(self.image, 5, 75, 75)
+        global update
+        update = cv2.bilateralFilter(update, 5, 75, 75)
 
-        h, w, _ = image.shape #높이 너비 채널
+        h, w, _ = update.shape #높이 너비 채널
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -648,17 +675,18 @@ class MainWindow(QMainWindow):
 
     #로버츠 교차 필터
     def roberts_filter(self):
+        global update
         gx_kernel = np.array([[1, 0],[0, -1]]) #x축의 경계만 나옴
         gy_kernel = np.array([[0, 1],[-1, 0]]) #y축의 경계만 나옴
 
-        edge_gx = cv2.filter2D(self.image, -1, gx_kernel)
-        edge_gy = cv2.filter2D(self.image, -1, gy_kernel)
+        edge_gx = cv2.filter2D(update, -1, gx_kernel)
+        edge_gy = cv2.filter2D(update, -1, gy_kernel)
 
-        image = edge_gx + edge_gy
+        update = edge_gx + edge_gy
 
-        h, w, _ = image.shape #높이 너비 채널
+        h, w, _ = update.shape #높이 너비 채널
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
@@ -667,17 +695,18 @@ class MainWindow(QMainWindow):
 
     #소벨 필터
     def sobel_filter(self):
+        global update
         gx_kernel = np.array([[-1, 0, 1],[-2, 0, 2], [-1, 0, 1]]) 
         gy_kernel = np.array([[-1, -2, -1],[0, 0, 0], [1, 2, 1]]) 
 
-        edge_gx = cv2.filter2D(self.image, -1, gx_kernel)
-        edge_gy = cv2.filter2D(self.image, -1, gy_kernel)
+        edge_gx = cv2.filter2D(update, -1, gx_kernel)
+        edge_gy = cv2.filter2D(update, -1, gy_kernel)
 
-        image = edge_gx + edge_gy
+        update = edge_gx + edge_gy
 
-        h, w, _ = image.shape #높이 너비 채널
+        h, w, _ = update.shape #높이 너비 채널
         bytes_per_line = 3 * w
-        image = QImage(image.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+        image = QImage(update.data, w, h, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pixmap = QPixmap(image)
         self.label2.setPixmap(pixmap)
