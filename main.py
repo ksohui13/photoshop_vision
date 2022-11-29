@@ -354,7 +354,6 @@ class MainWindow(QMainWindow):
     def bigger(self):
         global update
         h, w, _ = self.image.shape
-        # image = cv2.pyrUp(self.image, dstsize=(w*2, h*2), borderType=cv2.BORDER_DEFAULT) #dtsize : 출력사이즈
         update = cv2.resize(update, None,  None, 2, 2, cv2.INTER_CUBIC)
         
         bytes_per_line = 3 * w
